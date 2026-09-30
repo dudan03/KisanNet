@@ -1,0 +1,7 @@
+{
+  "name": "KisanNet - BRICS AgriN Digital Agriculture Network",
+  "description": "Interoperable digital agriculture network offering satellite agro-advisories, regenerative farming guidance, crop disease AI diagnosis, regional voice assistant, and SMS alerts for BRICS nations.",
+  "requestFramePermissions": ["geolocation", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
