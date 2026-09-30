@@ -19,6 +19,7 @@ import {
 import { AdvisoryData, FarmerProfile, LanguageCode } from '../types';
 import { translations } from '../data/translations';
 import { sampleProfiles } from '../data/sampleData';
+import { WeatherForecastWidget } from './WeatherForecastWidget';
 
 interface AdvisorySectionProps {
   currentLanguage: LanguageCode;
@@ -41,7 +42,7 @@ export const AdvisorySection: React.FC<AdvisorySectionProps> = ({
 }) => {
   const t = translations[currentLanguage];
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-  const [activeTab, setActiveTab] = useState<'today' | 'regenerative' | 'calendar' | 'satellite'>('today');
+  const [activeTab, setActiveTab] = useState<'today' | 'weather' | 'regenerative' | 'calendar' | 'satellite'>('today');
 
   // Handle SpeechSynthesis read-out-loud for the advisory
   const handleToggleAudio = () => {
@@ -177,7 +178,7 @@ export const AdvisorySection: React.FC<AdvisorySectionProps> = ({
         </div>
 
         {/* Advisory View Switcher Tabs (Segmented Control) */}
-        <div className="mt-6 flex items-center gap-1.5 p-1 bg-stone-200/70 rounded-xl max-w-fit" role="tablist">
+        <div className="mt-6 flex flex-wrap items-center gap-1.5 p-1 bg-stone-200/70 rounded-xl max-w-fit" role="tablist">
           <button
             onClick={() => setActiveTab('today')}
             className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
@@ -185,6 +186,15 @@ export const AdvisorySection: React.FC<AdvisorySectionProps> = ({
             }`}
           >
             Today's Primary Action
+          </button>
+          <button
+            onClick={() => setActiveTab('weather')}
+            className={`px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all flex items-center gap-1.5 ${
+              activeTab === 'weather' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-600 hover:text-stone-900'
+            }`}
+          >
+            <CloudRain className="w-3.5 h-3.5 text-blue-600" />
+            <span>5-Day Weather Forecast</span>
           </button>
           <button
             onClick={() => setActiveTab('regenerative')}
@@ -217,99 +227,119 @@ export const AdvisorySection: React.FC<AdvisorySectionProps> = ({
 
         {/* Tab 1: Today's Primary Action */}
         {activeTab === 'today' && (
-          <div className="mt-6 grid lg:grid-cols-12 gap-6">
-            {/* Primary Action Card */}
-            <div className="lg:col-span-8 bg-white rounded-2xl border border-stone-200 p-6 sm:p-8 shadow-xs">
-              <div className="flex items-center justify-between pb-4 border-b border-stone-100">
-                <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200">
-                  {advisory.primaryActionToday.urgency}
-                </span>
-                <span className="text-xs text-stone-500">
-                  Generated {advisory.generatedAt}
-                </span>
+          <div className="mt-6 space-y-6">
+            <div className="grid lg:grid-cols-12 gap-6">
+              {/* Primary Action Card */}
+              <div className="lg:col-span-8 bg-white rounded-2xl border border-stone-200 p-6 sm:p-8 shadow-xs">
+                <div className="flex items-center justify-between pb-4 border-b border-stone-100">
+                  <span className="text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200">
+                    {advisory.primaryActionToday.urgency}
+                  </span>
+                  <span className="text-xs text-stone-500">
+                    Generated {advisory.generatedAt}
+                  </span>
+                </div>
+
+                <div className="mt-4">
+                  <h3 className="text-xl sm:text-2xl font-bold text-stone-900 font-display">
+                    {advisory.primaryActionToday.title}
+                  </h3>
+                  <p className="mt-3 text-sm sm:text-base text-stone-700 leading-relaxed">
+                    {advisory.primaryActionToday.explanation}
+                  </p>
+                </div>
+
+                {/* Action Steps Checklist */}
+                <div className="mt-6 pt-6 border-t border-stone-100">
+                  <h4 className="text-xs font-bold text-stone-900 uppercase tracking-wider mb-3">
+                    Step-by-Step Implementation Today
+                  </h4>
+                  <div className="space-y-2.5 text-xs sm:text-sm text-stone-700">
+                    <div className="flex items-start gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                      <span>Halt urea broadcasting immediately to prevent nitrogen leaching during expected 48-hour showers.</span>
+                    </div>
+                    <div className="flex items-start gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                      <span>Install perforated AWD tube 15cm into the mud to monitor sub-surface ponding depth.</span>
+                    </div>
+                    <div className="flex items-start gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                      <span>Apply 200L liquid Jeevamrit at irrigation inlet to activate native soil microbes.</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="mt-4">
-                <h3 className="text-xl sm:text-2xl font-bold text-stone-900 font-display">
-                  {advisory.primaryActionToday.title}
-                </h3>
-                <p className="mt-3 text-sm sm:text-base text-stone-700 leading-relaxed">
-                  {advisory.primaryActionToday.explanation}
-                </p>
-              </div>
+              {/* Quick Triangulation Signals Panel */}
+              <div className="lg:col-span-4 space-y-4">
+                <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-xs">
+                  <div className="text-xs font-bold uppercase tracking-wider text-stone-900 mb-3 flex items-center justify-between">
+                    <span>Satellite Vigor</span>
+                    <span className="text-emerald-700 font-mono-numbers">NDVI 0.72</span>
+                  </div>
+                  <div className="w-full bg-stone-100 h-2.5 rounded-full overflow-hidden mb-2">
+                    <div className="bg-emerald-600 h-full rounded-full" style={{ width: '72%' }}></div>
+                  </div>
+                  <p className="text-xs text-stone-600">
+                    Vigorous vegetative canopy. Canopy density is high; avoid excessive vegetative growth stimulants.
+                  </p>
+                </div>
 
-              {/* Action Steps Checklist */}
-              <div className="mt-6 pt-6 border-t border-stone-100">
-                <h4 className="text-xs font-bold text-stone-900 uppercase tracking-wider mb-3">
-                  Step-by-Step Implementation Today
-                </h4>
-                <div className="space-y-2.5 text-xs sm:text-sm text-stone-700">
-                  <div className="flex items-start gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>Halt urea broadcasting immediately to prevent nitrogen leaching during expected 48-hour showers.</span>
+                <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-xs">
+                  <div className="text-xs font-bold uppercase tracking-wider text-stone-900 mb-3 flex items-center justify-between">
+                    <span>Soil Health Card Sync</span>
+                    <span className="text-stone-700 font-mono-numbers">pH 6.2 · OC 0.48%</span>
                   </div>
-                  <div className="flex items-start gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>Install perforated AWD tube 15cm into the mud to monitor sub-surface ponding depth.</span>
+                  <div className="space-y-1.5 text-xs text-stone-600">
+                    <div className="flex justify-between">
+                      <span>Organic Carbon (Target &gt;0.75%)</span>
+                      <strong className="text-amber-700 font-mono-numbers">0.48% (Low)</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Available Nitrogen</span>
+                      <strong className="text-stone-800">Medium (240 kg/ha)</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Phosphorus (Available)</span>
+                      <strong className="text-amber-700">Low (14 kg/ha)</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Potassium</span>
+                      <strong className="text-emerald-700">High (290 kg/ha)</strong>
+                    </div>
                   </div>
-                  <div className="flex items-start gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>Apply 200L liquid Jeevamrit at irrigation inlet to activate native soil microbes.</span>
+                </div>
+
+                <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-xs">
+                  <div className="text-xs font-bold uppercase tracking-wider text-stone-900 mb-2 flex items-center gap-1.5">
+                    <CloudRain className="w-4 h-4 text-blue-600" />
+                    <span>Weather Invariant Alert</span>
                   </div>
+                  <p className="text-xs text-stone-600">
+                    Rain risk peaks in 48-72h (12-18mm). Spraying pesticide now will waste money and cause aquatic toxicity in bunds.
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Quick Triangulation Signals Panel */}
-            <div className="lg:col-span-4 space-y-4">
-              <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-xs">
-                <div className="text-xs font-bold uppercase tracking-wider text-stone-900 mb-3 flex items-center justify-between">
-                  <span>Satellite Vigor</span>
-                  <span className="text-emerald-700 font-mono-numbers">NDVI 0.72</span>
-                </div>
-                <div className="w-full bg-stone-100 h-2.5 rounded-full overflow-hidden mb-2">
-                  <div className="bg-emerald-600 h-full rounded-full" style={{ width: '72%' }}></div>
-                </div>
-                <p className="text-xs text-stone-600">
-                  Vigorous vegetative canopy. Canopy density is high; avoid excessive vegetative growth stimulants.
-                </p>
-              </div>
+            {/* Embedded 5-Day Weather Context Component */}
+            <WeatherForecastWidget
+              activeProfile={activeProfile}
+              currentLanguage={currentLanguage}
+              lowDataMode={lowDataMode}
+            />
+          </div>
+        )}
 
-              <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-xs">
-                <div className="text-xs font-bold uppercase tracking-wider text-stone-900 mb-3 flex items-center justify-between">
-                  <span>Soil Health Card Sync</span>
-                  <span className="text-stone-700 font-mono-numbers">pH 6.2 · OC 0.48%</span>
-                </div>
-                <div className="space-y-1.5 text-xs text-stone-600">
-                  <div className="flex justify-between">
-                    <span>Organic Carbon (Target &gt;0.75%)</span>
-                    <strong className="text-amber-700 font-mono-numbers">0.48% (Low)</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Available Nitrogen</span>
-                    <strong className="text-stone-800">Medium (240 kg/ha)</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Phosphorus (Available)</span>
-                    <strong className="text-amber-700">Low (14 kg/ha)</strong>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Potassium</span>
-                    <strong className="text-emerald-700">High (290 kg/ha)</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-2xl border border-stone-200 p-5 shadow-xs">
-                <div className="text-xs font-bold uppercase tracking-wider text-stone-900 mb-2 flex items-center gap-1.5">
-                  <CloudRain className="w-4 h-4 text-blue-600" />
-                  <span>Weather Invariant Alert</span>
-                </div>
-                <p className="text-xs text-stone-600">
-                  Rain risk peaks in 48-72h (12-18mm). Spraying pesticide now will waste money and cause aquatic toxicity in bunds.
-                </p>
-              </div>
-            </div>
+        {/* Tab 2: 5-Day Weather Deep-Dive View */}
+        {activeTab === 'weather' && (
+          <div className="mt-6">
+            <WeatherForecastWidget
+              activeProfile={activeProfile}
+              currentLanguage={currentLanguage}
+              lowDataMode={lowDataMode}
+            />
           </div>
         )}
 

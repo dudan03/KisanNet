@@ -22,6 +22,23 @@ export interface WeatherData {
   windSpeed: number;
 }
 
+export interface DailyWeatherForecast {
+  date: string;
+  dayName: string;
+  condition: string;
+  conditionIcon: 'sun' | 'cloud-sun' | 'cloud-rain' | 'cloud-lightning' | 'cloud';
+  tempMax: number;
+  tempMin: number;
+  precipitationMm: number;
+  rainProbability: number;
+  humidity: number;
+  windSpeedKmH: number;
+  sprayWindow: 'Ideal' | 'Caution' | 'Unsuitable';
+  irrigationStatus: 'Pause (Rain Expected)' | 'Normal AWD Cycle' | 'Light Irrigation Recommended' | 'Conserve Moisture (Heat Alert)';
+  farmingContext: string;
+}
+
+
 export interface FarmerProfile {
   name: string;
   phone: string;
